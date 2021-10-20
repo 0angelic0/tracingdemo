@@ -16,23 +16,28 @@ func main() {
 	}
 	helloTo := os.Args[1]
 
-	tracer, closer := tracing.Init("hello-world")
+	tracer, closer := tracing.Init("hello-service2")
 	defer closer.Close()
+
+	// Set Jaeger Tracer as a Global Tracer for opentracing library
 	opentracing.SetGlobalTracer(tracer)
 
+	// Start span
 	span := tracer.StartSpan("say-hello")
 	span.SetTag("hello-to", helloTo)
 	defer span.Finish()
 
+	// Create span context
 	ctx := context.Background()
 	spanCtx := opentracing.ContextWithSpan(ctx, span)
 
+	// Do things with span context
 	helloStr := formatString(spanCtx, helloTo)
 	printHello(spanCtx, helloStr)
 }
 
 func formatString(ctx context.Context, helloTo string) string {
-	// span := rootSpan.Tracer().StartSpan("formatString", opentracing.ChildOf(rootSpan.Context()))
+	// Start child span, operation name = formatString
 	span, _ := opentracing.StartSpanFromContext(ctx, "formatString")
 	defer span.Finish()
 
@@ -46,7 +51,7 @@ func formatString(ctx context.Context, helloTo string) string {
 }
 
 func printHello(ctx context.Context, helloStr string) {
-	// span := rootSpan.Tracer().StartSpan("printHello", opentracing.ChildOf(rootSpan.Context()))
+	// Start another child span, operation name = printHello
 	span, _ := opentracing.StartSpanFromContext(ctx, "printHello")
 	defer span.Finish()
 

@@ -23,14 +23,8 @@ func main() {
 	c := New(e, nil)
 	defer c.Close()
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
 	// Routes
-	e.GET("/", hello)
-	e.GET("/users/:id", getUser)
-	e.GET("/users", getUsers, track)
+	e.GET("/name", nameHandler)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
@@ -68,18 +62,11 @@ func New(e *echo.Echo, skipper middleware.Skipper) io.Closer {
 }
 
 // Handler
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
+func nameHandler(c echo.Context) error {
+	return c.String(http.StatusOK, randomName())
 }
 
-func getUser(c echo.Context) error {
-	// User ID from path `users/:id`
-	id := c.Param("id")
-	return c.String(http.StatusOK, id)
-}
-
-func getUsers(c echo.Context) error {
-	return c.String(http.StatusOK, "/users")
+func randomName() string {
 }
 
 // Route level middleware
