@@ -17,8 +17,19 @@ func main() {
 	helloTo := os.Args[1]
 
 	// Create Jaeger Tracer
+	// cfg := &config.Configuration{
+	// 	ServiceName: "king-tracingdemo",
+	// 	Sampler: &config.SamplerConfig{
+	// 		Type:  "const",
+	// 		Param: 1,
+	// 	},
+	// 	Reporter: &config.ReporterConfig{
+	// 		LogSpans: true,
+	// 	},
+	// }
+
 	cfg := &config.Configuration{
-		ServiceName: "hello-service",
+		ServiceName: "king-tracingdemo",
 		Sampler: &config.SamplerConfig{
 			Type:  "const",
 			Param: 1,
@@ -27,6 +38,15 @@ func main() {
 			LogSpans: true,
 		},
 	}
+	fmt.Printf("1st cfg = %+v", cfg)
+
+	// Override configurations by ENV
+	cfg, err := cfg.FromEnv()
+	if err != nil {
+		fmt.Errorf("error = %+v", err)
+	}
+	fmt.Printf("2nd cfg = %+v", cfg)
+
 	tracer, closer, err := cfg.NewTracer(config.Logger(jaeger.StdLogger))
 	if err != nil {
 		panic(fmt.Sprintf("ERROR: cannot init Jaeger: %v\n", err))
